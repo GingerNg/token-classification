@@ -1,0 +1,96 @@
+from tensorflow import keras
+from keras.models import Sequential
+from keras.layers import Embedding, Bidirectional, LSTM, Dense, TimeDistributed
+# from keras_contrib.layers.crf import CRF
+# from keras_contrib import losses, metrics
+from tensorflow_addons.layers import CRF
+from tensorflow_addons import losses, metrics
+import process_data
+import pickle
+
+EMBED_DIM = 200
+BiRNN_UNITS = 200
+
+
+import tensorflow as tf
+from tensorflow_addons.text.crf import crf_log_likelihood
+# https://github.com/tensorflow/addons/issues/2313
+def unpack_data(data):
+    if len(data) == 2:
+        return data[0], data[1], None
+    elif len(data) == 3:
+        return data
+    else:
+        raise TypeError("Expected data to be a tuple of size 2 or 3.")
+
+class ModelWithCRFLoss(tf.keras.Model):
+    """Wrapper around the base model for custom training logic."""
+
+    def __init__(self, base_model):
+        super().__init__()
+        self.base_model = base_model
+
+    def call(self, inputs):
+        return self.base_model(inputs)
+
+    def compute_loss(self, x, y, sample_weight, training=False):
+        y_pred = self(x, training=training)
+        _, potentials, sequence_length, chain_kernel = y_pred
+
+        # we now add the CRF loss:
+        crf_loss = -crf_log_likelihood(potentials, y, sequence_length, chain_kernel)[0]
+
+        if sample_weight is not None:
+            crf_loss = crf_loss * sample_weight
+
+        return tf.reduce_mean(crf_loss), sum(self.losses)
+
+    def train_step(self, data):
+        x, y, sample_weight = unpack_data(data)
+
+        with tf.GradientTape() as tape:
+            crf_loss, internal_losses = self.compute_loss(
+                x, y, sample_weight, training=True
+            )
+            total_loss = crf_loss + internal_losses
+
+        gradients = tape.gradient(total_loss, self.trainable_variables)
+        self.optimizer.apply_gradients(zip(gradients, self.trainable_variables))
+
+        return {"crf_loss": crf_loss, "internal_losses": internal_losses}
+
+    def test_step(self, data):
+        x, y, sample_weight = unpack_data(data)
+        crf_loss, internal_losses = self.compute_loss(x, y, sample_weight)
+        return {"crf_loss_val": crf_loss, "internal_losses_val": internal_losses}
+
+
+def create_model(train=True):
+    if train:
+        (train_x, train_y), (test_x, test_y), (vocab, chunk_tags) = process_data.load_data()
+    else:
+        with open('model/config.pkl', 'rb') as inp:
+            (vocab, chunk_tags) = pickle.load(inp)
+
+    n_tags = len(chunk_tags)
+    model = Sequential()
+    model.add(Embedding(len(vocab), EMBED_DIM, mask_zero=True))  # Random embedding
+    model.add(Bidirectional(LSTM(BiRNN_UNITS // 2, return_sequences=True)))
+    crf = CRF(n_tags)
+    model.add(crf)
+
+
+    # # dense
+    # dense = TimeDistributed(Dense(n_tags, activation="softmax"))
+    # model.add(dense)
+
+    model.summary()
+
+    # model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"])
+
+    # model.compile('adam', loss=crf.loss_function, metrics=[crf.accuracy])
+    model.compile('adam', loss=ModelWithCRFLoss)
+    if train:
+        return model, (train_x, train_y), (test_x, test_y)
+    else:
+        return model, (vocab, chunk_tags)

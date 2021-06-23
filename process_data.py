@@ -14,7 +14,7 @@ def load_data():
     chunk_tags = ['O', 'B-PER', 'I-PER', 'B-LOC', 'I-LOC', "B-ORG", "I-ORG"]
 
     # save initial config data
-    with open('model/config.pkl', 'wb') as outp:
+    with open('saved_model/config.pkl', 'wb') as outp:
         pickle.dump((vocab, chunk_tags), outp)
 
     train = _process_data(train, vocab, chunk_tags)
@@ -49,7 +49,7 @@ def _process_data(data, vocab, chunk_tags, maxlen=None, onehot=False):
 
     x = pad_sequences(x, maxlen)  # left padding
 
-    y_chunk = pad_sequences(y_chunk, maxlen, value=-1)
+    y_chunk = pad_sequences(y_chunk, maxlen, value=0)
 
     if onehot:
         y_chunk = numpy.eye(len(chunk_tags), dtype='float32')[y_chunk]
