@@ -22,3 +22,12 @@ pip3 uninstall -y pandas
 
 
 
+60dae74e0a26cb0ab984e134
+
+60dc351b8f19755bd6cd8286
+
+{'_id':{'$gt':ObjectId("60dc351b8f19755bd6cd8286")}}
+
+
+
+https://tech.retrieva.jp/entry/2019/12/20/121726
