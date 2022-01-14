@@ -14,10 +14,10 @@ BiRNN_UNITS = 100
 model_dir = "saved_model"
 
 
-def create_model(EMBED_DIM, vocab, n_tags, use_crf=True, use_mask=True):
+def create_model(EMBED_DIM, vocab_size, n_tags, use_crf=True, use_mask=True):
     # function API
     s_input = layers.Input(shape=(None,))
-    emb_layer = layers.Embedding(len(vocab),
+    emb_layer = layers.Embedding(vocab_size,
                                  EMBED_DIM,
                                  embeddings_initializer=keras.initializers.Orthogonal(
                                      gain=1.0, seed=1),

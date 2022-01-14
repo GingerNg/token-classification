@@ -1,8 +1,9 @@
 # 通过import实现不同的行为
 # import models.hotel_process_data as process_data  # 根据模型输入和数据集处理data
+from models.base import NerModel
 import models.cck_process_data as process_data
 # import models.cck_process_data_bert as process_data
-
+from keras.callbacks import EarlyStopping, History, ModelCheckpoint, ReduceLROnPlateau
 import pickle
 # import tensorflow_addons as tfa
 
@@ -13,12 +14,6 @@ import models.bilstm as resp_model  # 两层BiLSTM+CRF
 EMBED_DIM = 100
 BiRNN_UNITS = 100
 model_dir = "saved_model"
-
-
-class NerModel(object):
-  def __init__(self) -> None:
-      super().__init__()
-
 
 
 def create_model(train=True, dataset_name=None, model_name=None, use_crf=True):

@@ -1,5 +1,5 @@
 # zh-NER-keras
-> this project is a sample for Chinese Named Entity Recognition(NER)
+> this project is a sample for Named Entity Recognition(NER)
 fork from https://github.com/stephen-v/zh-NER-keras
 refer to https://github.com/Timaos123/BiLSTM-CRF
 
@@ -31,3 +31,5 @@ pip3 uninstall -y pandas
 
 
 https://tech.retrieva.jp/entry/2019/12/20/121726
+
+

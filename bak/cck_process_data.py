@@ -9,10 +9,19 @@ import random
 maxlen = 36
 
 
-def load_data():
-    train = _parse_data(open('data/CCKS2021中文NLP地址要素解析/train_human.conll', 'r'))
+def load_data(train_pth='data/CCKS2021中文NLP地址要素解析/train_human.conll', test_pth='data/CCKS2021中文NLP地址要素解析/dev.conll'):
+    """[load data in conll format]
+
+    Args:
+        train_pth (str, optional): [description]. Defaults to
+        test_pth (str, optional): [description]. Defaults to
+
+    Returns:
+        [type]: [description]
+    """
+    train = _parse_data(open(train_pth, 'r'))
     # train = _parse_data(open('data/CCKS2021中文NLP地址要素解析/train.conll', 'r'))
-    test = _parse_data(open('data/CCKS2021中文NLP地址要素解析/dev.conll', 'r'))
+    test = _parse_data(open(test_pth, 'r'))
     # print(train)
     word_counts = Counter(row[0].lower() for sample in train for row in sample)
     vocab = [w for w, f in iter(word_counts.items()) if f >= 2]
