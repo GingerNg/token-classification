@@ -44,3 +44,7 @@ coverage.xml
 docs/_build/
 .idea
 
+docs/papers/ner/.DS_Store
+docs/papers/.DS_Store
+docs/.DS_Store
+.DS_Store

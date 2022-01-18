@@ -1,7 +1,12 @@
-# zh-NER-keras
+# token-classification
+
+alias: sequence-tagger
+
 > this project is a sample for Named Entity Recognition(NER)
 fork from https://github.com/stephen-v/zh-NER-keras
-refer to https://github.com/Timaos123/BiLSTM-CRF
+refer to
+https://github.com/Timaos123/BiLSTM-CRF
+https://github.com/flairNLP/flair
 
 adapt code with tensorflow-macos
 
@@ -31,5 +36,4 @@ pip3 uninstall -y pandas
 
 
 https://tech.retrieva.jp/entry/2019/12/20/121726
-
 
