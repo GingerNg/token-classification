@@ -14,17 +14,21 @@ from keras.preprocessing.sequence import pad_sequences
 configuration = BertConfig()
 
 # Save the slow pretrained tokenizer
-slow_tokenizer = BertTokenizer.from_pretrained("bert-base-chinese")
-save_path = "bert_base_chinese/"
-if not os.path.exists(save_path):
-    os.makedirs(save_path)
-slow_tokenizer.save_pretrained(save_path)
 
+model_name = "bert-base-uncased"
+save_path = os.getenv("USERPTH")+"/data/huggingface/" + model_name
+vocab_path = save_path + "/vocab.txt"
+
+# if not os.path.exists(save_path):
+#     os.makedirs(save_path)
+# slow_tokenizer.save_pretrained(save_path)
+
+slow_tokenizer = BertTokenizer.from_pretrained(save_path)
 
 class BertLayer(layers.Layer):
     def __init__(self):
         super(BertLayer, self).__init__()
-        self.encoder = TFBertModel.from_pretrained("bert-base-chinese")
+        self.encoder = TFBertModel.from_pretrained(save_path)
 
     def call(self, inputs):
         input_ids, token_type_ids, attention_mask = inputs
